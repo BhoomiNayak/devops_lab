@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps Lab Manual – BCSL657D</title>
+<link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0f1117;
+    --surface:#181c27;
+    --card:#1e2233;
+    --border:#2a2f45;
+    --accent:#5b6af0;
+    --accent2:#38bdf8;
+    --green:#22d3a0;
+    --amber:#f59e0b;
+    --text:#e2e8f0;
+    --muted:#8892aa;
+    --code-bg:#141820;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;min-height:100vh}
+
+  /* ── TOP NAV ── */
+  header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem}
+  .nav-inner{display:flex;align-items:center;gap:1.5rem;height:56px;max-width:1200px;margin:0 auto}
+  .nav-logo{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+  .nav-links{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{font-size:12px;padding:4px 10px;border-radius:6px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:all .15s}
+  .nav-links a:hover,.nav-links a.active{color:var(--text);background:var(--card)}
+  .badge{display:inline-block;font-size:10px;font-weight:600;background:var(--accent);color:#fff;border-radius:4px;padding:1px 6px;margin-right:4px;vertical-align:middle}
+
+  /* ── HERO ── */
+  .hero{max-width:1200px;margin:0 auto;padding:4rem 2rem 2rem}
+  .hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;line-height:1.2;margin-bottom:.75rem}
+  .hero h1 span{color:var(--accent)}
+  .hero p{color:var(--muted);font-size:1rem;max-width:600px;margin-bottom:2rem}
+  .meta-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2rem}
+  .chip{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);color:var(--muted)}
+  .chip i{margin-right:4px;vertical-align:-1px}
+
+  /* ── PROGRAM GRID ── */
+  .prog-grid{max-width:1200px;margin:0 auto;padding:0 2rem 2rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+  .prog-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--text)}
+  .prog-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .prog-card .num{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.08em;margin-bottom:.4rem}
+  .prog-card h3{font-size:.95rem;font-weight:600;margin-bottom:.4rem;line-height:1.3}
+  .prog-card p{font-size:12px;color:var(--muted);line-height:1.4}
+  .prog-card .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:.75rem}
+  .tag{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(91,106,240,.12);color:var(--accent);border:1px solid rgba(91,106,240,.2)}
+  .tag.green{background:rgba(34,211,160,.1);color:var(--green);border-color:rgba(34,211,160,.2)}
+  .tag.amber{background:rgba(245,158,11,.1);color:var(--amber);border-color:rgba(245,158,11,.2)}
+
+  /* ── PROGRAM PAGE ── */
+  .page{display:none;max-width:1200px;margin:0 auto;padding:2rem}
+  .page.active{display:block}
+  .page-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  .page-num{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;transition:.15s;margin-bottom:1.5rem}
+  .back-btn:hover{color:var(--text);border-color:var(--accent)}
+
+  /* ── CONTENT BLOCKS ── */
+  .section{margin-bottom:2rem}
+  .section-title{font-size:14px;font-weight:600;color:var(--accent2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .step-list{display:flex;flex-direction:column;gap:1.25rem}
+  .step{display:flex;gap:1rem;align-items:flex-start}
+  .step-num{min-width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  .step-body h4{font-size:.9rem;font-weight:600;margin-bottom:.3rem}
+  .step-body p{font-size:.85rem;color:var(--muted);line-height:1.5}
+
+  /* ── CODE BLOCK ── */
+  .code-wrap{margin:.9rem 0;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .code-header{display:flex;align-items:center;justify-content:space-between;background:#1a1e2e;padding:8px 14px;border-bottom:1px solid var(--border)}
+  .code-header-left{display:flex;align-items:center;gap:8px}
+  .code-dots{display:flex;gap:5px}
+  .code-dots span{width:11px;height:11px;border-radius:50%;display:block}
+  .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+  .code-lang{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .copy-btn{font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:5px;padding:3px 10px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px}
+  .copy-btn:hover{color:var(--text);border-color:var(--accent)}
+  .copy-btn.copied{color:var(--green);border-color:var(--green)}
+  .cmd-block{background:var(--code-bg);padding:1rem 1.25rem;font-family:'Consolas','Cascadia Code','Fira Mono',monospace;font-size:13px;line-height:1.9;color:#c9d1d9;overflow-x:auto;white-space:pre;tab-size:2}
+  /* syntax tokens */
+  .t-comment{color:#6a737d;font-style:italic}
+  .t-cmd{color:#79c0ff;font-weight:600}
+  .t-flag{color:#ffb86c}
+  .t-val{color:#a5d6ff}
+  .t-str{color:#a8ff78}
+  .t-kw{color:#ff9f43}
+  .t-path{color:#88ddff;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted}
+  .t-prompt{color:#22d3a0;user-select:none;margin-right:6px}
+  .t-out{color:#8892aa;font-style:italic}
+  .t-section{color:#e2e8f0;font-weight:600;display:block;margin-top:.25rem}
+  /* label above code block */
+  .cmd-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin:.9rem 0 .3rem;display:flex;align-items:center;gap:6px}
+  .cmd-label::before{content:'';display:inline-block;width:3px;height:3px;border-radius:50%;background:var(--accent)}
+
+  /* info / note box */
+  .note{background:rgba(91,106,240,.08);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:.75rem 1rem;margin:.75rem 0;font-size:.85rem;color:var(--muted)}
+  .note.warn{background:rgba(245,158,11,.08);border-color:var(--amber)}
+  .note strong{color:var(--text)}
+
+  /* key-value table */
+  .kv-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.5rem 0}
+  .kv-table th{text-align:left;padding:.5rem .75rem;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border)}
+  .kv-table td{padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+  .kv-table td:first-child{color:var(--accent2);font-family:monospace;font-size:12px}
+  .kv-table tr:last-child td{border-bottom:none}
+
+  /* two-column diff */
+  .diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.75rem 0}
+  .diff-col{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1rem}
+  .diff-col h5{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em}
+
+  @media(max-width:600px){.diff-grid{grid-template-columns:1fr}.prog-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <span class="nav-logo">DevOps <span style="opacity:.4">|</span> BCSL657D</span>
+    <nav class="nav-links" id="navLinks">
+      <a href="#" onclick="showHome()" class="active" id="homeNav">Home</a>
+      <a href="#" onclick="showPage(1)" id="nav1">Prog 1</a>
+      <a href="#" onclick="showPage(2)" id="nav2">Prog 2</a>
+      <a href="#" onclick="showPage(3)" id="nav3">Prog 3</a>
+      <a href="#" onclick="showPage(4)" id="nav4">Prog 4</a>
+      <a href="#" onclick="showPage(5)" id="nav5">Prog 5</a>
+      <a href="#" onclick="showPage(6)" id="nav6">Prog 6</a>
+      <a href="#" onclick="showPage(7)" id="nav7">Prog 7</a>
+      <a href="#" onclick="showPage(8)" id="nav8">Prog 8</a>
+      <a href="#" onclick="showPage(9)" id="nav9">Prog 9</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="homePage">
+  <div class="hero">
+    <div class="meta-chips">
+      <span class="chip"><i class="ti ti-building-community"></i>Sir MVIT, Bengaluru</span>
+      <span class="chip"><i class="ti ti-calendar"></i>2024–25</span>
+      <span class="chip"><i class="ti ti-award"></i>6th Sem B.E.</span>
+      <span class="chip"><i class="ti ti-hash"></i>BCSL657D</span>
+    </div>
+    <h1>DevOps <span>Laboratory</span><br>Manual</h1>
+    <p>A complete reference for all 12 lab programs covering Maven, Gradle, Jenkins, Ansible, and Azure DevOps — with commands, steps, and theory.</p>
+  </div>
+
+  <div class="prog-grid">
+    <div class="prog-card" onclick="showPage(1)">
+      <div class="num">Program 1</div>
+      <h3>Maven & Gradle — Overview & Installation</h3>
+      <p>Build automation tools comparison, environment setup, and verification.</p>
+      <div class="tags"><span class="tag">Maven</span><span class="tag">Gradle</span><span class="tag">Setup</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(2)">
+      <div class="num">Program 2</div>
+      <h3>Working with Maven</h3>
+      <p>Create Maven projects, understand POM files, manage dependencies and plugins.</p>
+      <div class="tags"><span class="tag">pom.xml</span><span class="tag">Lifecycle</span><span class="tag">Plugins</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(3)">
+      <div class="num">Program 3</div>
+      <h3>Working with Gradle</h3>
+      <p>Gradle project setup, Groovy & Kotlin DSL, dependency and task automation.</p>
+      <div class="tags"><span class="tag">Groovy</span><span class="tag">Kotlin DSL</span><span class="tag green">Tasks</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(4)">
+      <div class="num">Program 4</div>
+      <h3>Build with Maven → Migrate to Gradle</h3>
+      <p>Build and run a Java app with Maven, then migrate the same project to Gradle.</p>
+      <div class="tags"><span class="tag">Migration</span><span class="tag green">CI</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(5)">
+      <div class="num">Program 5</div>
+      <h3>Introduction to Jenkins</h3>
+      <p>Install Jenkins locally on Windows, configure for first use, unlock and set up dashboard.</p>
+      <div class="tags"><span class="tag amber">Jenkins</span><span class="tag">CI/CD</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(6)">
+      <div class="num">Program 6</div>
+      <h3>CI Pipeline with Jenkins</h3>
+      <p>Set up a CI pipeline, integrate Jenkins with Maven/Gradle, run automated builds.</p>
+      <div class="tags"><span class="tag amber">Jenkins</span><span class="tag">GitHub</span><span class="tag green">Pipeline</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(7)">
+      <div class="num">Program 7</div>
+      <h3>Configuration Management with Ansible</h3>
+      <p>Ansible basics — inventory, playbooks, modules. Write and run a basic playbook on WSL.</p>
+      <div class="tags"><span class="tag green">Ansible</span><span class="tag">WSL</span><span class="tag">YAML</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(8)">
+      <div class="num">Program 8</div>
+      <h3>Jenkins CI + Ansible CD</h3>
+      <p>Jenkins pipeline for Maven, Ansible deploys generated JAR artifact to local server.</p>
+      <div class="tags"><span class="tag amber">Jenkins</span><span class="tag green">Ansible</span><span class="tag">Deploy</span></div>
+    </div>
+    <div class="prog-card" onclick="showPage(9)">
+      <div class="num">Program 9</div>
+      <h3>Introduction to Azure DevOps</h3>
+      <p>Overview of Azure DevOps services, set up an account, create an organization and project.</p>
+      <div class="tags"><span class="tag">Azure</span><span class="tag">DevOps</span><span class="tag green">Cloud</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 1 ══════════════ -->
+<div class="page" id="page1">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 1</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Introduction to Maven & Gradle</h2>
+      <p style="color:var(--muted);font-size:.9rem">Overview of build automation tools, key differences, installation and environment setup</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-books"></i> Theory</div>
+    <p style="font-size:.9rem;color:var(--muted);margin-bottom:1rem">Build automation tools compile source code, run tests, manage dependencies, and package applications. Maven (XML-based, convention-over-configuration) and Gradle (DSL-based, high performance via caching) are the two dominant tools in the Java ecosystem.</p>
+    <table class="kv-table">
+      <tr><th>Aspect</th><th>Maven</th><th>Gradle</th></tr>
+      <tr><td>Config file</td><td>pom.xml (XML)</td><td>build.gradle (Groovy/Kotlin)</td></tr>
+      <tr><td>Performance</td><td>Slower</td><td>Faster — incremental builds + cache</td></tr>
+      <tr><td>Flexibility</td><td>Convention-driven</td><td>Highly customisable</td></tr>
+      <tr><td>Dependency repo</td><td>Maven Central</td><td>Maven Central + custom</td></tr>
+      <tr><td>Learning curve</td><td>Gentler</td><td>Slightly steeper</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-download"></i> Installing Maven (Windows)</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Verify Java is installed</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">java</span> <span class="t-flag">-version</span></div></div>
+        <p>Requires JDK 17 (recommended). Download from oracle.com if absent.</p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Download Maven ZIP</h4>
+        <p>Go to <strong>maven.apache.org/download</strong> → Download the latest binary ZIP (e.g. apache-maven-3.9.9-bin.zip).</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Extract & place folder</h4>
+        <p>Extract the ZIP and move the folder to <code style="color:var(--green)">C:\Program Files\apache-maven-x.x.x</code></p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Set Environment Variables</h4>
+        <p>Open <em>Edit the system environment variables</em> → Environment Variables</p>
+        <div class="cmd-label">New System Variable</div>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">environment variable</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-kw">Variable name:</span>  <span class="t-val">MAVEN_HOME</span>
+<span class="t-kw">Variable value:</span> <span class="t-path">C:\Program Files\apache-maven-3.9.9</span></div></div>
+        <div class="cmd-label">Edit PATH → Add new entry</div>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">path</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-path">C:\Program Files\apache-maven-3.9.9\bin</span></div></div>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Verify installation</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">mvn</span> <span class="t-flag">-version</span></div></div>
+        <p>Should print Maven version, Java version, and OS info.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-download"></i> Installing Gradle (Windows)</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Download Gradle ZIP</h4>
+        <p>Go to <strong>gradle.org/releases</strong> → Download binary-only ZIP (e.g. gradle-8.12.1-bin.zip).</p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Extract & place folder</h4>
+        <p>Move extracted folder to <code style="color:var(--green)">C:\Program Files\gradle-8.12.1</code></p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Set Environment Variables</h4>
+        <div class="cmd-label">New System Variable</div>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">environment variable</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-kw">Variable name:</span>  <span class="t-val">GRADLE_HOME</span>
+<span class="t-kw">Variable value:</span> <span class="t-path">C:\gradle-8.12.1</span></div></div>
+        <div class="cmd-label">Edit PATH → Add</div>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">path</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-path">C:\gradle-8.12.1\bin</span></div></div>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Verify installation</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">gradle</span> <span class="t-flag">-version</span></div></div>
+        <p>Should show Gradle version, Kotlin, Groovy, JVM info.</p>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 2 ══════════════ -->
+<div class="page" id="page2">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 2</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Working with Maven</h2>
+      <p style="color:var(--muted);font-size:.9rem">Creating a Maven project, understanding pom.xml, dependency management and plugins</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-terminal"></i> Create Maven Project (CLI)</div>
+    <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">mvn</span> archetype:generate <span class="t-flag">-DgroupId</span>=<span class="t-val">com.mvit</span> <span class="t-flag">-DartifactId</span>=<span class="t-val">flipkart-app</span> \
+    <span class="t-flag">-DarchetypeArtifactId</span>=<span class="t-val">maven-archetype-quickstart</span> \
+    <span class="t-flag">-DarchetypeVersion</span>=<span class="t-val">1.4</span> <span class="t-flag">-DinteractiveMode</span>=<span class="t-val">false</span></div></div>
+    <div class="note"><strong>groupId</strong> — org/domain identifier &nbsp;|&nbsp; <strong>artifactId</strong> — project name &nbsp;|&nbsp; <strong>-DinteractiveMode=false</strong> — skip prompts</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-file-code"></i> pom.xml Key Elements</div>
+    <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">xml — pom.xml</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-comment">&lt;!-- Core identifiers --&gt;</span>
+&lt;<span class="t-kw">groupId</span>&gt;<span class="t-val">com.mvit</span>&lt;/groupId&gt;
+&lt;<span class="t-kw">artifactId</span>&gt;<span class="t-val">flipkart-app</span>&lt;/artifactId&gt;
+&lt;<span class="t-kw">version</span>&gt;<span class="t-val">1.0-SNAPSHOT</span>&lt;/version&gt;
+&lt;<span class="t-kw">packaging</span>&gt;<span class="t-val">jar</span>&lt;/packaging&gt;
+
+<span class="t-comment">&lt;!-- Dependency example --&gt;</span>
+&lt;<span class="t-kw">dependencies</span>&gt;
+  &lt;dependency&gt;
+    &lt;<span class="t-kw">groupId</span>&gt;<span class="t-val">junit</span>&lt;/groupId&gt;
+    &lt;<span class="t-kw">artifactId</span>&gt;<span class="t-val">junit</span>&lt;/artifactId&gt;
+    &lt;<span class="t-kw">version</span>&gt;<span class="t-val">4.11</span>&lt;/version&gt;
+    &lt;<span class="t-kw">scope</span>&gt;<span class="t-val">test</span>&lt;/scope&gt;
+  &lt;/dependency&gt;
+&lt;/dependencies&gt;</div></div>
+    <table class="kv-table">
+      <tr><th>Scope</th><th>When available</th></tr>
+      <tr><td>compile</td><td>All phases (default)</td></tr>
+      <tr><td>provided</td><td>Compile only — not bundled at runtime</td></tr>
+      <tr><td>runtime</td><td>Runtime only, not compile</td></tr>
+      <tr><td>test</td><td>Test compilation and execution only</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-player-play"></i> Build Commands</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Navigate to project</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">cd</span> <span class="t-path">flipkart-app</span></div></div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Compile source</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">mvn</span> compile</div></div>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Run unit tests</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">mvn</span> test</div></div>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Package into JAR</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">mvn</span> package</div></div>
+        <p>Generates <code style="color:var(--green);font-family:monospace">target/flipkart-app-1.0-SNAPSHOT.jar</code></p>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Run the JAR</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">java</span> <span class="t-flag">-cp</span> <span class="t-path">target/flipkart-app-1.0-SNAPSHOT.jar</span> <span class="t-val">com.mvit.App</span></div></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-plug"></i> Common Plugins</div>
+    <table class="kv-table">
+      <tr><th>Plugin</th><th>Purpose</th></tr>
+      <tr><td>maven-compiler-plugin</td><td>Compiles Java source code</td></tr>
+      <tr><td>maven-surefire-plugin</td><td>Runs unit tests</td></tr>
+      <tr><td>maven-jar-plugin</td><td>Packages project as JAR</td></tr>
+      <tr><td>maven-clean-plugin</td><td>Deletes target/ directory</td></tr>
+      <tr><td>tomcat7-maven-plugin</td><td>Deploys WAR to embedded Tomcat</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 3 ══════════════ -->
+<div class="page" id="page3">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 3</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Working with Gradle</h2>
+      <p style="color:var(--muted);font-size:.9rem">Setting up a Gradle project, Groovy & Kotlin DSL, dependency management and task automation</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-terminal"></i> Create Gradle Project</div>
+    <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-comment"># In your project folder</span>
+<span class="t-prompt">$</span><span class="t-cmd">gradle</span> init</div></div>
+    <div class="note">During <code>gradle init</code> you'll be prompted to select: build type → <strong>Application</strong>, language → <strong>Java</strong>, Java version → <strong>17</strong>, DSL → <strong>Groovy (2)</strong> or <strong>Kotlin (1)</strong>, test framework → <strong>JUnit 4 (1)</strong></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-file-code"></i> Build Scripts — Groovy vs Kotlin</div>
+    <div class="diff-grid">
+      <div class="diff-col">
+        <h5>Groovy DSL (build.gradle)</h5>
+        <pre style="font-size:12px;color:#a9b1d6;white-space:pre-wrap">plugins {
+    id <span style="color:var(--green)">'application'</span>
+}
+repositories {
+    mavenCentral()
+}
+dependencies {
+    testImplementation <span style="color:var(--green)">'junit:junit:4.13.2'</span>
+    implementation libs.guava
+}
+application {
+    mainClass = <span style="color:var(--green)">'org.example.App'</span>
+}</pre>
+      </div>
+      <div class="diff-col">
+        <h5>Kotlin DSL (build.gradle.kts)</h5>
+        <pre style="font-size:12px;color:#a9b1d6;white-space:pre-wrap">plugins {
+    id(<span style="color:var(--green)">"application"</span>)
+}
+repositories {
+    mavenCentral()
+}
+dependencies {
+    testImplementation(<span style="color:var(--green)">"junit:junit:4.13.2"</span>)
+    implementation(libs.guava)
+}
+application {
+    mainClass = <span style="color:var(--green)">"org.example.App"</span>
+}</pre>
+      </div>
+    </div>
+    <div class="note"><strong>Groovy:</strong> dynamic, concise &nbsp;|&nbsp; <strong>Kotlin:</strong> statically-typed, better IDE support and compile-time error detection</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-player-play"></i> Gradle Commands</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Build the project</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">gradle</span> build</div></div>
+        <p>Compiles, tests, and creates output in build/libs/</p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Run the application</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">gradle</span> run</div></div>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Run unit tests</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">gradle</span> test</div></div>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Clean build outputs</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-prompt">$</span><span class="t-cmd">gradle</span> clean</div></div>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Run a custom task (Groovy example)</h4>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">groovy — build.gradle</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-kw">task</span> <span class="t-cmd">printMessage</span> {
+    doLast {
+        println <span class="t-str">'This is a custom task automation'</span>
+    }
+}</div></div>
+        <div class="code-wrap"><div class="code-header"><div class="code-header-left"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">terminal</span></div><button class="copy-btn" onclick="copyCode(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="cmd-block"><span class="t-comment"># Run custom task:</span>
+<span class="t-prompt">$</span><span class="t-cmd">gradle</span> printMessage</div></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 4 ══════════════ -->
+<div class="page" id="page4">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 4</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Maven → Gradle Migration</h2>
+      <p style="color:var(--muted);font-size:.9rem">Build and run a Java app with Maven, then migrate the same project to Gradle</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-brand-maven"></i> Part A — Build with Maven</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Create Maven project</h4>
+        <div class="cmd-block">mvn archetype:generate <span class="flag">-DgroupId</span>=com.example <span class="flag">-DartifactId</span>=maven-project <span class="flag">-DarchetypeArtifactId</span>=maven-archetype-quickstart <span class="flag">-DinteractiveMode</span>=false</div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Edit App.java</h4>
+        <p>Open <code style="color:var(--green)">src/main/java/com/example/App.java</code> and write your program.</p>
+        <div class="cmd-block">System.out.println(<span class="str">"Hello Maven!"</span>);
+System.out.println(<span class="str">"This is the simple example"</span>);</div>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Compile, test, package, run</h4>
+        <div class="cmd-block">cd maven-project
+mvn compile
+mvn test
+mvn package
+java -cp target/maven-project-1.0-SNAPSHOT.jar com.example.App</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-refresh"></i> Part B — Migrate to Gradle</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Run Gradle init inside Maven project folder</h4>
+        <div class="cmd-block">gradle init</div>
+        <p>Gradle detects the existing Maven build and prompts: <em>"Found a Maven build. Generate a Gradle build from this?"</em> → Type <strong>yes</strong></p>
+        <p>Select DSL: <strong>2 (Groovy)</strong> &nbsp;→&nbsp; New APIs: <strong>no</strong></p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Update build.gradle — add application plugin</h4>
+        <div class="cmd-block">plugins {
+    id <span class="str">'java-library'</span>
+    id <span class="str">'maven-publish'</span>
+    id <span class="str">'application'</span>   <span class="comment">// enables 'gradle run'</span>
+}
+application {
+    mainClass = <span class="str">'com.example.App'</span>
+}</div>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Build and run with Gradle</h4>
+        <div class="cmd-block">gradle build
+gradle run</div>
+        <p>Output should match the Maven run — both print "Hello Maven!"</p>
+      </div></div>
+    </div>
+    <div class="note warn"><strong>Verify migration:</strong> Maven output and Gradle output must be identical to confirm a successful migration.</div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 5 ══════════════ -->
+<div class="page" id="page5">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 5</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Introduction to Jenkins</h2>
+      <p style="color:var(--muted);font-size:.9rem">Install Jenkins on Windows, configure for first use, unlock and explore the dashboard</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-books"></i> What is Jenkins?</div>
+    <p style="font-size:.9rem;color:var(--muted)">Jenkins is an open-source automation server for CI/CD. It automates building, testing, and deploying software. Key features include a vast plugin ecosystem, pipeline-as-code (Groovy DSL), and cross-platform support.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-download"></i> Install Jenkins on Windows</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Verify Java</h4>
+        <div class="cmd-block">java -version</div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Download Jenkins installer</h4>
+        <p>Go to <strong>jenkins.io</strong> → Download → Windows installer (.msi)</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Run installer</h4>
+        <p>Select <em>"Run as Local System"</em> → Choose port (default: <strong>8080</strong>) → Click Test → Set Java path (e.g. <code style="color:var(--green)">C:\Program Files\Java\jdk-17\</code>) → Click Next until install completes.</p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Access Jenkins in browser</h4>
+        <div class="cmd-block">http://localhost:8080</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-lock-open"></i> First-Time Setup</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Retrieve initial admin password</h4>
+        <div class="cmd-block"><span class="comment"># Open this file in Notepad and copy the password:</span>
+C:\ProgramData\Jenkins\.jenkins\secrets\initialAdminPassword</div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Unlock Jenkins</h4>
+        <p>Paste the password on the "Unlock Jenkins" page → Click Continue</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Install suggested plugins</h4>
+        <p>Select <em>"Install suggested plugins"</em> — wait for installation to complete</p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Create admin profile</h4>
+        <p>Fill in username, password, full name, email → Save and Continue → Save and Finish → Start Using Jenkins</p>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 6 ══════════════ -->
+<div class="page" id="page6">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 6</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">CI Pipeline with Jenkins</h2>
+      <p style="color:var(--muted);font-size:.9rem">Set up a CI pipeline, integrate with Maven/Gradle, run automated builds and tests</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-plug"></i> Step 1–2 — Install Plugins & Push Code</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Install required plugins</h4>
+        <p>Manage Jenkins → Plugins → Available → Search and install: <strong>Git Plugin</strong>, <strong>Maven Integration Plugin</strong>, <strong>Gradle Plugin</strong>, <strong>Pipeline Plugin</strong></p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Push Maven project to GitHub via Git Bash</h4>
+        <div class="cmd-block">git init
+git add .
+git commit -m <span class="str">"first commit"</span>
+git branch -M main
+git remote add origin https://github.com/username/repo.git
+git push -u origin main</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-settings"></i> Step 3–7 — Configure Jenkins Job</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Create Freestyle project</h4>
+        <p>Dashboard → New Item → Name: <code style="color:var(--green)">Maven-CI-Pipeline</code> → Freestyle project → OK</p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Source Code Management</h4>
+        <p>Select Git → Enter GitHub repo URL → Change branch to <code style="color:var(--green)">main</code></p>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Build Triggers</h4>
+        <p>Check <em>Poll SCM</em> → Schedule:</p>
+        <div class="cmd-block">H/5 * * * *   <span class="comment"># polls GitHub every 5 minutes</span></div>
+      </div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Build Steps</h4>
+        <p>Add build step → <em>Invoke top-level Maven targets</em></p>
+        <div class="cmd-block">Goals: clean compile test package</div>
+        <p>Add another step → <em>Execute Windows batch command</em></p>
+        <div class="cmd-block">java -cp target/your-app-1.0-SNAPSHOT.jar com.example.App</div>
+      </div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-body"><h4>Build Now & Verify</h4>
+        <p>Click <em>Build Now</em> → Console Output should show: code pulled ✔ build success ✔ tests run ✔ JAR generated ✔</p>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 7 ══════════════ -->
+<div class="page" id="page7">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 7</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Configuration Management with Ansible</h2>
+      <p style="color:var(--muted);font-size:.9rem">Ansible basics — inventory, playbooks, modules. Write and run a basic playbook on WSL.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-books"></i> Ansible Components</div>
+    <table class="kv-table">
+      <tr><th>Component</th><th>Description</th></tr>
+      <tr><td>Inventory</td><td>File listing target hosts (servers) Ansible will manage</td></tr>
+      <tr><td>Playbook</td><td>YAML file defining tasks to execute on target hosts</td></tr>
+      <tr><td>Module</td><td>Unit of work — e.g. apt (package mgmt), service, copy, shell</td></tr>
+      <tr><td>Ad-hoc command</td><td>One-off module call without a playbook</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-brand-ubuntu"></i> Lab Setup on WSL</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Install WSL on Windows</h4>
+        <div class="cmd-block"><span class="comment"># Run in PowerShell as Administrator:</span>
+wsl --install</div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Install Ubuntu 22.04 from Microsoft Store</h4>
+        <p>Open Ubuntu → create a UNIX username and password</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Update packages & install Ansible</h4>
+        <div class="cmd-block">sudo apt update -y
+sudo apt install ansible -y
+ansible --version</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-file-code"></i> Lab Execution</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Create working directory</h4>
+        <div class="cmd-block">mkdir ansible-lab
+cd ansible-lab</div>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Create inventory file</h4>
+        <div class="cmd-block">vi inventory.ini</div>
+        <div class="cmd-label">Content of inventory.ini</div>
+        <div class="cmd-block">[local]
+localhost ansible_connection=local</div>
+        <p>Save: press <kbd>Esc</kbd> then type <code>:wq</code> and hit Enter</p>
+      </div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Test connectivity</h4>
+        <div class="cmd-block">ansible all -i inventory.ini -m ping</div>
+        <div class="cmd-label">Expected output</div>
+        <div class="cmd-block">localhost | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}</div>
+      </div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-body"><h4>Create playbook to install htop</h4>
+        <div class="cmd-block">vi install_htop.yml</div>
+        <div class="cmd-label">Content of install_htop.yml</div>
+        <div class="cmd-block">---
+- name: Install htop system monitor tool
+  hosts: local
+  become: true
+  tasks:
+    - name: Install htop package
+      ansible.builtin.package:
+        name: htop
+        state: present</div>
+      </div></div>
+      <div class="step"><div class="step-num">8</div><div class="step-body"><h4>Run the playbook</h4>
+        <div class="cmd-block">ansible-playbook -i inventory.ini install_htop.yml</div>
+      </div></div>
+      <div class="step"><div class="step-num">9</div><div class="step-body"><h4>Verify htop is installed</h4>
+        <div class="cmd-block">htop</div>
+        <p>Interactive system monitor opens. Press <kbd>q</kbd> to exit.</p>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 8 ══════════════ -->
+<div class="page" id="page8">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 8</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Jenkins CI + Ansible CD</h2>
+      <p style="color:var(--muted);font-size:.9rem">Jenkins builds Maven project; Ansible deploys the generated JAR to local server</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-brand-github"></i> Part A — Jenkins CI</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Create Maven project & push to GitHub</h4>
+        <div class="cmd-block">git init
+git add .
+git commit -m <span class="str">"Initial commit"</span>
+git branch -M main
+git remote add origin &lt;GitHub_Repo_URL&gt;
+git push -u origin main</div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Configure Jenkins Freestyle job</h4>
+        <p>New Item → Freestyle → SCM: Git (paste repo URL) → Build Trigger: Poll SCM <code>H/5 * * * *</code></p>
+        <div class="cmd-label">Build → Invoke top-level Maven targets</div>
+        <div class="cmd-block">Goals: clean compile test package</div>
+        <div class="cmd-label">Windows Batch Command</div>
+        <div class="cmd-block">java -cp target/your-app-1.0-SNAPSHOT.jar com.mvit.App</div>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Archive the JAR artifact</h4>
+        <p>Post-build action → <em>Archive the artifacts</em></p>
+        <div class="cmd-block">Files to archive: target/*.jar</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-server"></i> Part B — Ansible CD</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Install Ansible in WSL</h4>
+        <div class="cmd-block">sudo apt update -y
+sudo apt install ansible -y</div>
+      </div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Create inventory & deploy playbook</h4>
+        <div class="cmd-block">mkdir ansible-lab && cd ansible-lab
+vi inventory.ini</div>
+        <div class="cmd-label">inventory.ini</div>
+        <div class="cmd-block">[local]
+localhost ansible_connection=local</div>
+        <div class="cmd-block">vi deploy.yml</div>
+        <div class="cmd-label">deploy.yml</div>
+        <div class="cmd-block">---
+- name: Deploy JAR from Jenkins
+  hosts: local
+  become: true
+  tasks:
+    - name: Copy JAR file
+      copy:
+        src: /mnt/c/ProgramData/Jenkins/.jenkins/workspace/&lt;job&gt;/target/your-app.jar
+        dest: /home/&lt;username&gt;/ansible-lab/app.jar
+        mode: '0755'
+    - name: Run JAR file
+      shell: nohup java -jar /home/&lt;username&gt;/ansible-lab/app.jar > app.log 2>&1 &</div>
+      </div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Run the playbook</h4>
+        <div class="cmd-block">ansible-playbook -i inventory.ini deploy.yml</div>
+      </div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-body"><h4>Verify deployment</h4>
+        <div class="cmd-block">cat app.log</div>
+        <p>Should show application output e.g. "Hello welcome to Devops lab"</p>
+      </div></div>
+    </div>
+    <div class="note warn"><strong>Manifest error?</strong> Add <code>maven-jar-plugin</code> to pom.xml with <code>&lt;mainClass&gt;com.mvit.App&lt;/mainClass&gt;</code>, then <code>git push</code> to trigger a new Jenkins build.</div>
+  </div>
+</div>
+
+<!-- ══════════════ PROGRAM 9 ══════════════ -->
+<div class="page" id="page9">
+  <button class="back-btn" onclick="showHome()"><i class="ti ti-arrow-left"></i> Back</button>
+  <div class="page-header">
+    <div>
+      <div class="page-num">Program 9</div>
+      <h2 style="font-size:1.5rem;margin:.25rem 0">Introduction to Azure DevOps</h2>
+      <p style="color:var(--muted);font-size:.9rem">Overview of Azure DevOps services, set up an account, create an organization and project</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-cloud"></i> Azure DevOps Services</div>
+    <table class="kv-table">
+      <tr><th>Service</th><th>Purpose</th></tr>
+      <tr><td>Azure Repos</td><td>Git / TFVC version control — manage code, track changes</td></tr>
+      <tr><td>Azure Pipelines</td><td>CI/CD — auto build, test, deploy to any environment</td></tr>
+      <tr><td>Azure Boards</td><td>Agile PM — Kanban, Scrum, user stories, backlogs</td></tr>
+      <tr><td>Azure Test Plans</td><td>Manual & exploratory testing, defect tracking</td></tr>
+      <tr><td>Azure Artifacts</td><td>Host & share packages (NuGet, npm, Maven)</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-user-plus"></i> Account & Project Setup</div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Open Azure DevOps portal</h4>
+        <div class="cmd-block">https://aex.dev.azure.com</div>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Sign in with Microsoft account</h4>
+        <p>Use existing email or create a free Microsoft account</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Create a new organization</h4>
+        <p>Click <em>"New organization"</em></p>
+        <div class="cmd-block">Organization name: Vtu-Devops-org
+Location: South India (or nearest region)</div>
+        <p>Click Continue</p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Create a new project</h4>
+        <p>Dashboard → <em>New project</em></p>
+        <div class="cmd-block">Project name: MyFirstDevOpsProject
+Description: This is my first Azure DevOps lab project
+Visibility: Private</div>
+        <p>Click <em>Create</em> — you'll land on the project dashboard with Boards, Repos, Pipelines, Test Plans, and Artifacts in the left sidebar.</p>
+      </div></div>
+    </div>
+    <div class="note"><strong>Free tier includes:</strong> unlimited private repos, 1 parallel CI job (1,800 min/month for public projects), Azure Boards for 5 users free.</div>
+  </div>
+</div>
+
+<script>
+function showHome(){
+  document.getElementById('homePage').style.display='block';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('homeNav').classList.add('active');
+  window.scrollTo(0,0);
+}
+function showPage(n){
+  document.getElementById('homePage').style.display='none';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  document.getElementById('nav'+n).classList.add('active');
+  window.scrollTo(0,0);
+}
+function copyCode(btn){
+  const block=btn.closest('.code-wrap').querySelector('.cmd-block');
+  const text=block.innerText.replace(/^\$\s/gm,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('copied');
+    btn.innerHTML='<i class="ti ti-check"></i> Copied';
+    setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML='<i class="ti ti-copy"></i> Copy';},2000);
+  });
+}
+</script>
+</body>
+</html>
