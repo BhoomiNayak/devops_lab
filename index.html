@@ -764,11 +764,11 @@ localhost ansible_connection=local</div>
   tasks:
     - name: Copy JAR file
       copy:
-        src: /mnt/c/ProgramData/Jenkins/.jenkins/workspace/&lt;job&gt;/target/your-app.jar
+        src: /mnt/c/ProgramData/Jenkins/.jenkins/workspace/jenkins-try/com.example/target/com.example-1.0-SNAPSHOT.jar
         dest: /home/&lt;username&gt;/ansible-lab/app.jar
         mode: '0755'
     - name: Run JAR file
-      shell: nohup java -jar /home/&lt;username&gt;/ansible-lab/app.jar > app.log 2>&1 &</div>
+      shell: nohup java -jar /home/<your-ubuntu-username>/ansible-lab/app.jar > app.log 2>&1 &</div>
       </div></div>
       <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Run the playbook</h4>
         <div class="cmd-block">ansible-playbook -i inventory.ini deploy.yml</div>
